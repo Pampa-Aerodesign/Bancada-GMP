@@ -1,12 +1,15 @@
-// == Controlador da bancada de teste de Torque x Corrente de servos ==
+// == Controlador da bancada do grupo motopropulsor ==
 
 /* 
-Este programa faz a medição em tempo real da corrente consumida por um servo
-e exibe a leitura num display LCD 16x2.
-A posição do servo pode ser controlada por um potenciômetro.
-Para obter uma média de corrente com um maior número de amostras, basta
-pressionar o botão HOLD. O resultado obtido será escrito no display até
-que o botão seja pressionado novamente.
+Este programa faz a medição em tempo real de uma célula de carga
+e exibe a leitura num display LCD 16x2 e no monitor serial.
+Para ter uma leitura com maior número de amostras, basta pressionar
+uma vez o botão HOLD. A média das leituras será exibida no display.
+Para zerar a leitura da célula de carga (tara), basta segurar
+o botão HOLD por dois segundos.
+
+O número de amostragens em tempo real e em hold pode ser
+ajustado nos defines abaixo.
 */
 
 // Libraries
@@ -18,9 +21,10 @@ que o botão seja pressionado novamente.
 // Configuration
 #define BAUD 57600			// Baud rate
 #define DSAMPLES 1			// Number of samples to capture for calculating "real time" average
-#define SAMPLES 10			// Number of samples to capture for calculating average on button press
-#define DELAY	100				// Small delay to slow things down
-#define DEBOUNCE 50			// Debounce delay
+#define SAMPLES 5				// Number of samples to capture for calculating average on button press
+#define HLDDELAY 50			// HOLD debounce delay
+#define TAREDELAY 2000	// Tare button delay
+#define DELAY	100				// Generic delay
 #define CALIB 0.0f			// Scale calibration
 
 // Pinouts
@@ -42,13 +46,12 @@ LiquidCrystal lcd(LCDPINS);
 
 // Global variables
 bool hold = 0;					// HOLD flag (false = running; true = holding)
-bool hldstate = 0;			// HOLD state
-bool lasthldbtn = 0;		// Previous reading from HOLD button
+bool lasthldbtn = 1;		// Previous reading from HOLD button
 uint64_t lasthldt = 0;	// Last time the HOLD flag was toggled
 
 bool doneflag = 0;			// Flag when sensor reading is done
-float weight;						// Current reading in miliamps
-float avg;							// Current average
+float weight;						// Weight reading in grams
+float avg;							// Weight average
 int64_t total = 0;			// Sum of all samples
 
 
@@ -62,7 +65,7 @@ void setup() {
 	lcd.print("Initializing...");
 
 	//Set HOLD button to input
-	pinMode(HOLDPIN, INPUT);
+	pinMode(HOLDPIN, INPUT_PULLUP);
 
 	// Initializing HX711 module
 	scale.begin(HXPINS);
@@ -95,30 +98,51 @@ void setup() {
 void loop() {
 	// Variables
 	int holdbtn;			// HOLD button reading
+	int btntime;	// How long the button has been pressed
 
 	// Reading HOLD button
 	holdbtn = digitalRead(HOLDPIN);
 
 	// Debouncing and toggling HOLD state
-	if (holdbtn != lasthldbtn) {
-    // reset the debouncing timer
-    lasthldt = millis();
+	// Store the time when the button was pressed
+	if(holdbtn != lasthldbtn && !holdbtn){
+    lasthldt = millis();						// Time when button was pressed
   }
-	if ((millis() - lasthldt) > DEBOUNCE) {
-    // whatever the reading is at, it's been there for longer than the
-    // debounce delay, so take it as the actual current state
 
-    // if the button state has changed
-    if (holdbtn != hldstate) {
-      hldstate = holdbtn;
+	// If the button is still being pressed, calculate for how long
+	if(!holdbtn){
+		btntime = millis() - lasthldt;	// How long the button has been pressed
+	}
 
-			if(hldstate == HIGH){
-				hold = !hold;
-			}
-    }
+	// If button is pressed for more than debounce delay, 
+	// but released in less than 2 seconds, toggle HOLD state
+	if(btntime > HLDDELAY && btntime < TAREDELAY && holdbtn){
+		hold = !hold;
+		btntime = 0;
   }
+
+	// If button is held for more than 2 seconds, set tare weight
+	else if(btntime > TAREDELAY){
+		// Print tare message on display
+		lcd.setCursor(0,0);
+		lcd.print("Reading...");
+		Serial.print("Reading...");
+
+		// Zeroing the scale
+		scale.tare();
+
+		// Print tare message on display
+		lcd.setCursor(0,0);
+		lcd.print("Tare set");
+		Serial.print("Tare set");
+
+		delay(2000);
+		btntime = 0;
+	}
+	
 	// Save button reading for the next loop
 	lasthldbtn = holdbtn;
+	
 
 	// If HOLD is off, take readings in real time with fewer samples
 	if(!hold){
@@ -132,7 +156,7 @@ void loop() {
 		doneflag = false;
 	}
 
-	// If HOLD is on, take one reading with more samples
+	// If HOLD is on, take one reading with more samples and keep it on screen
 	else{
 		if(!doneflag){
 			// Get reading from sensor
@@ -151,7 +175,7 @@ void loop() {
 	// Printing to serial monitor/plotter
 	Serial.print(avg);
 	Serial.print("\t");
+	Serial.print(btntime);	// somehow if you remove these two lines
+	Serial.print("\t");			// the program stops working
 	Serial.println(hold);
-
-	//delay(DELAY);	// Slow down to make reading easier
 }
