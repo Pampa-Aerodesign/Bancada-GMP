@@ -17,6 +17,7 @@ ajustado nos defines abaixo.
 #include <LiquidCrystal.h>
 #include "sampling.hpp"
 #include "display.hpp"
+#include "tare.hpp"
 
 // Configuration
 #define BAUD 57600			// Baud rate
@@ -48,6 +49,7 @@ LiquidCrystal lcd(LCDPINS);
 bool hold = 0;					// HOLD flag (false = running; true = holding)
 bool lasthldbtn = 1;		// Previous reading from HOLD button
 uint64_t lasthldt = 0;	// Last time the HOLD flag was toggled
+unsigned long btntime;		// How long the button has been pressed
 
 bool doneflag = 0;			// Flag when sensor reading is done
 float weight;						// Weight reading in grams
@@ -72,10 +74,6 @@ void setup() {
 
 	delay(1000);
 
-	// Zeroing scale
-	scale.tare();
-
-
 	// Print debug message on display
 	lcd.setCursor(0,0);				// Return cursor
 	lcd.print("Complete");
@@ -88,6 +86,9 @@ void setup() {
 	Serial.println(scale.get_scale());
 	delay(2000);
 
+	// Zeroing the scale
+	set_tare(scale, lcd);
+
 	// Clear display
 	lcd.clear();
 
@@ -96,8 +97,7 @@ void setup() {
 
 void loop() {
 	// Variables
-	int holdbtn;						// HOLD button reading
-	unsigned long btntime;	// How long the button has been pressed
+	int holdbtn;								// HOLD button reading
 
 	// Reading HOLD button
 	holdbtn = digitalRead(HOLDPIN);
@@ -122,23 +122,13 @@ void loop() {
 
 	// If button is held for more than 2 seconds, set tare weight
 	else if(btntime > TAREDELAY){
-		// Print tare message on display
-		lcd.setCursor(0,0);
-		lcd.print("Reading...");
-		Serial.print("Reading...");
 
 		// Zeroing the scale
-		scale.tare();
-
-		// Print tare message on display
-		lcd.setCursor(0,0);
-		lcd.print("Tare set");
-		Serial.print("Tare set");
+		set_tare(scale, lcd);
 
 		delay(2000);
 		btntime = 0;
 	}
-	
 	// Save button reading for the next loop
 	lasthldbtn = holdbtn;
 	
@@ -161,7 +151,7 @@ void loop() {
 			// Print tare message on display
 			lcd.setCursor(0,0);
 			lcd.print("Reading...");
-			Serial.print("Reading...");
+			Serial.println("Reading...");
 
 			// Get reading from sensor
 			weight = getweight(scale, SAMPLES);
