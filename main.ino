@@ -20,8 +20,8 @@ ajustado nos defines abaixo.
 
 // Configuration
 #define BAUD 57600			// Baud rate
-#define DSAMPLES 1			// Number of samples to capture for calculating "real time" average
-#define SAMPLES 5				// Number of samples to capture for calculating average on button press
+#define DSAMPLES 2			// Number of samples to capture for calculating "real time" average
+#define SAMPLES 20			// Number of samples to capture for calculating average on button press
 #define HLDDELAY 50			// HOLD debounce delay
 #define TAREDELAY 2000	// Tare button delay
 #define DELAY	100				// Generic delay
@@ -51,7 +51,6 @@ uint64_t lasthldt = 0;	// Last time the HOLD flag was toggled
 
 bool doneflag = 0;			// Flag when sensor reading is done
 float weight;						// Weight reading in grams
-float avg;							// Weight average
 int64_t total = 0;			// Sum of all samples
 
 
@@ -147,10 +146,10 @@ void loop() {
 	// If HOLD is off, take readings in real time with fewer samples
 	if(!hold){
 		// Get reading from sensor
-		avg = getweight(scale, DSAMPLES);
+		weight = getweight(scale, DSAMPLES);
 
 		// Print reading to display
-		printReading(lcd, avg, hold);
+		printReading(lcd, weight, hold);
 
 		// Reset reading done flag 
 		doneflag = false;
@@ -165,10 +164,10 @@ void loop() {
 			Serial.print("Reading...");
 
 			// Get reading from sensor
-			avg = getweight(scale, SAMPLES);
+			weight = getweight(scale, SAMPLES);
 
 			// Print reading to display
-			printReading(lcd, avg, hold);
+			printReading(lcd, weight, hold);
 
 			// Set reading done flag 
 			doneflag = true;
@@ -178,7 +177,7 @@ void loop() {
 	}
 
 	// Printing to serial monitor/plotter
-	Serial.print(avg);			// Print average
+	Serial.print(weight);		// Print weight
 	Serial.print("\t");
 	Serial.print(btntime);	// somehow if you remove these two lines
 	Serial.print("\t");			// the program stops working
