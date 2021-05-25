@@ -97,8 +97,8 @@ void setup() {
 
 void loop() {
 	// Variables
-	int holdbtn;			// HOLD button reading
-	int btntime;	// How long the button has been pressed
+	int holdbtn;						// HOLD button reading
+	unsigned long btntime;	// How long the button has been pressed
 
 	// Reading HOLD button
 	holdbtn = digitalRead(HOLDPIN);
@@ -159,6 +159,11 @@ void loop() {
 	// If HOLD is on, take one reading with more samples and keep it on screen
 	else{
 		if(!doneflag){
+			// Print tare message on display
+			lcd.setCursor(0,0);
+			lcd.print("Reading...");
+			Serial.print("Reading...");
+
 			// Get reading from sensor
 			avg = getweight(scale, SAMPLES);
 
@@ -173,9 +178,9 @@ void loop() {
 	}
 
 	// Printing to serial monitor/plotter
-	Serial.print(avg);
+	Serial.print(avg);			// Print average
 	Serial.print("\t");
 	Serial.print(btntime);	// somehow if you remove these two lines
 	Serial.print("\t");			// the program stops working
-	Serial.println(hold);
+	Serial.println(hold);		// Print "HOLD" or "Running" message
 }

@@ -17,7 +17,7 @@ void printReading(LiquidCrystal lcd, float value, bool hold){
 			break;
 		
 		case false:
-			strcpy(state, "Reading...");
+			strcpy(state, "Running...");
 			break;
 	}
 
