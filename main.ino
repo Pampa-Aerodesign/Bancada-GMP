@@ -76,9 +76,9 @@ void setup() {
 
 	// Print debug message on display
 	lcd.setCursor(0,0);				// Return cursor
-	lcd.print("Complete");
+	lcd.print("Complete       ");
 	lcd.setCursor(0,1);				// Set cursor to next line
-	lcd.print("Scale: ");
+	lcd.print("Scale:         ");
 	lcd.print(scale.get_scale());
 
 	// Print debug messages on serial monitor
@@ -150,7 +150,7 @@ void loop() {
 		if(!doneflag){
 			// Print tare message on display
 			lcd.setCursor(0,0);
-			lcd.print("Reading...");
+			lcd.print("Reading...     ");
 			Serial.println("Reading...");
 
 			// Get reading from sensor

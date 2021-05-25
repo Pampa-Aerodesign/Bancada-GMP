@@ -13,11 +13,11 @@ void printReading(LiquidCrystal lcd, float value, bool hold){
 	// Select which state the program is in and copies to the string
 	switch(hold){
 		case true:
-			strcpy(state, "Holding");
+			strcpy(state, "Holding        ");
 			break;
 		
 		case false:
-			strcpy(state, "Running...");
+			strcpy(state, "Running...     ");
 			break;
 	}
 
@@ -26,7 +26,7 @@ void printReading(LiquidCrystal lcd, float value, bool hold){
 	lcd.setCursor(0,1);		// Return cursor to second line
 	lcd.print("T = ");
 	lcd.print(value, 1);	// Print the value with one decimal place 
-	lcd.print("kg");
+	lcd.print("g");
 
 	return;
 }
