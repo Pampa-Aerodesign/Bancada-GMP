@@ -13,11 +13,11 @@ void printReading(LiquidCrystal lcd, float value, bool hold){
 	// Select which state the program is in and copies to the string
 	switch(hold){
 		case true:
-			strcpy(state, "Holding        ");
+			strcpy(state, "HOLD           ");
 			break;
 		
 		case false:
-			strcpy(state, "Running...     ");
+			strcpy(state, "Running        ");
 			break;
 	}
 
@@ -30,4 +30,3 @@ void printReading(LiquidCrystal lcd, float value, bool hold){
 
 	return;
 }
-

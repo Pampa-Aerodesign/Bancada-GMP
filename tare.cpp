@@ -7,7 +7,7 @@
 void set_tare(HX711 scale, LiquidCrystal lcd){
 	// Print reading message
 	lcd.setCursor(0,0);
-	lcd.print("Reading...     ");
+	lcd.print("Zeroing...     ");
 	Serial.print("Reading...");
 
 	// Zeroing the scale
