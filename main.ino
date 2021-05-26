@@ -29,13 +29,13 @@ ajustado nos defines abaixo.
 #define CALIB 0.0f			// Scale calibration
 
 // Pinouts
-#define HOLDPIN 6				// Digital input pin for HOLD button
+#define HOLDPIN 13				// Digital input pin for HOLD button
 
 // HX711 Pinout (DT, SCK)
-#define HXPINS 7, 8
+#define HXPINS 11, 12
 
 // LCD Pinout (RS, EN, D4, D5, D6, D7)
-#define LCDPINS 12, 11, 5, 4, 3, 2
+#define LCDPINS 2, 3, 4, 5, 6, 7
 
 
 // Declaring HX711 module
@@ -78,7 +78,7 @@ void setup() {
 	lcd.setCursor(0,0);				// Return cursor
 	lcd.print("Complete       ");
 	lcd.setCursor(0,1);				// Set cursor to next line
-	lcd.print("Scale:         ");
+	lcd.print("Scale: ");
 	lcd.print(scale.get_scale());
 
 	// Print debug messages on serial monitor
