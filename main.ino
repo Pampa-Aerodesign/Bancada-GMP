@@ -22,14 +22,14 @@ ajustado nos defines abaixo.
 // Configuration
 #define BAUD 57600			// Baud rate
 #define DSAMPLES 2			// Number of samples to capture for calculating "real time" average
-#define SAMPLES 20			// Number of samples to capture for calculating average on button press
+#define SAMPLES 50			// Number of samples to capture for calculating average on button press
 #define HLDDELAY 50			// HOLD debounce delay
 #define TAREDELAY 2000	// Tare button delay
 #define DELAY	100				// Generic delay
-#define CALIB 0.0f			// Scale calibration
+#define CALIB 420.4f		// Scale calibration
 
 // Pinouts
-#define HOLDPIN 13				// Digital input pin for HOLD button
+#define HOLDPIN 13			// Digital input pin for HOLD button
 
 // HX711 Pinout (DT, SCK)
 #define HXPINS 11, 12
@@ -49,7 +49,7 @@ LiquidCrystal lcd(LCDPINS);
 bool hold = 0;					// HOLD flag (false = running; true = holding)
 bool lasthldbtn = 1;		// Previous reading from HOLD button
 uint64_t lasthldt = 0;	// Last time the HOLD flag was toggled
-unsigned long btntime;		// How long the button has been pressed
+unsigned long btntime;	// How long the button has been pressed
 
 bool doneflag = 0;			// Flag when sensor reading is done
 float weight;						// Weight reading in grams
@@ -88,6 +88,7 @@ void setup() {
 
 	// Zeroing the scale
 	set_tare(scale, lcd);
+	scale.tare();		// tare() function does not work on tare.cpp
 
 	// Clear display
 	lcd.clear();
@@ -125,6 +126,7 @@ void loop() {
 
 		// Zeroing the scale
 		set_tare(scale, lcd);
+		scale.tare();		// tare() function does not work on tare.cpp
 
 		delay(2000);
 		btntime = 0;
@@ -167,9 +169,9 @@ void loop() {
 	}
 
 	// Printing to serial monitor/plotter
-	Serial.print(weight);		// Print weight
+	Serial.print(weight);		
 	Serial.print("\t");
 	Serial.print(btntime);	// somehow if you remove these two lines
 	Serial.print("\t");			// the program stops working
-	Serial.println(hold);		// Print "HOLD" or "Running" message
+	Serial.println(hold);		
 }
