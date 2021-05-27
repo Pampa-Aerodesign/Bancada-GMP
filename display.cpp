@@ -26,7 +26,7 @@ void printReading(LiquidCrystal lcd, float value, bool hold){
 	lcd.setCursor(0,1);		// Return cursor to second line
 	lcd.print("T = ");
 	lcd.print(value, 1);	// Print the value with one decimal place 
-	lcd.print("g");
+	lcd.print("g   ");
 
 	return;
 }
