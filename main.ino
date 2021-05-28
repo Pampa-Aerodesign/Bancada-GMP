@@ -46,16 +46,16 @@ LiquidCrystal lcd(LCDPINS);
 
 
 // Global variables
-bool hold = 0;					// HOLD flag (false = running; true = holding)
-bool lasthldbtn = 1;		// Previous reading from HOLD button
-uint64_t lasthldt = 0;	// Last time the HOLD flag was toggled
-unsigned long btntime;	// How long the button has been pressed
-unsigned long logtime;	// Time since log started
-unsigned long startlog;	// Time when log started
+bool hold = 0;							// HOLD flag (false = running; true = holding)
+bool lasthldbtn = 1;				// Previous reading from HOLD button
+uint64_t lasthldt = 0;			// Last time the HOLD flag was toggled
+unsigned long btntime;			// How long the button has been pressed
+unsigned long logtime = 0;	// Time since log started
+unsigned long startlog = 0;	// Time when log started
 
-bool doneflag = 0;			// Flag when sensor reading is done
-float weight;						// Weight reading in grams
-int64_t total = 0;			// Sum of all samples
+bool doneflag = 0;					// Flag when sensor reading is done
+float weight;								// Weight reading in grams
+int64_t total = 0;					// Sum of all samples
 
 
 void setup() {
