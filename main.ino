@@ -22,7 +22,7 @@ ajustado nos defines abaixo.
 // Configuration
 #define BAUD 57600			// Baud rate
 #define DSAMPLES 2			// Number of samples to capture for calculating "real time" average
-#define SAMPLES 50			// Number of samples to capture for calculating average on button press
+#define SAMPLES 20			// Number of samples to capture for calculating average on button press
 #define HLDDELAY 50			// HOLD debounce delay
 #define TAREDELAY 2000	// Tare button delay
 #define DELAY	100				// Generic delay
@@ -50,6 +50,8 @@ bool hold = 0;					// HOLD flag (false = running; true = holding)
 bool lasthldbtn = 1;		// Previous reading from HOLD button
 uint64_t lasthldt = 0;	// Last time the HOLD flag was toggled
 unsigned long btntime;	// How long the button has been pressed
+unsigned long logtime;	// Time since log started
+unsigned long startlog;	// Time when log started
 
 bool doneflag = 0;			// Flag when sensor reading is done
 float weight;						// Weight reading in grams
@@ -119,6 +121,7 @@ void loop() {
 	if(btntime > HLDDELAY && btntime < TAREDELAY && holdbtn){
 		hold = !hold;
 		btntime = 0;
+		startlog = millis();	// Set log start time
   }
 
 	// If button is held for more than 2 seconds, set tare weight
@@ -168,10 +171,13 @@ void loop() {
 		delay(DELAY);
 	}
 
+	// Calculate logtime
+	logtime = millis() - startlog;
+
 	// Printing to serial monitor/plotter
-	Serial.print(weight);		
-	Serial.print("\t");
-	Serial.print(btntime);	// somehow if you remove these two lines
-	Serial.print("\t");			// the program stops working
-	Serial.println(hold);		
+	Serial.print(logtime);
+	Serial.print("/");
+	Serial.print(weight);
+	Serial.print("/");
+	Serial.println(" ");
 }
